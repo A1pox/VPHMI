@@ -1,88 +1,61 @@
 import {
-  calculateArea,
-  capitalizeFirstLetter,
-  createBook,
-  createUser,
-  findById,
-  getFirstElement,
-  getStatusColor,
-  type HasId,
-  trimAndFormat,
-} from "./tasks";
+  groupBy,
+  having,
+  query,
+  sort,
+  where,
+  type Group,
+} from "./query";
 
-const bookWithYear = createBook({
-  title: "1984",
-  author: "Джордж Оруэлл",
-  year: 1949,
-  genre: "fiction",
-});
-
-const bookWithoutYear = createBook({
-  title: "Слово о полку Игореве",
-  author: "Аноним",
-  genre: "fiction",
-});
-
-const numbers = [1, 2, 3, 4, 5];
-const strings = ["яблоко", "бургер", "вишня"];
-const emptyArray: number[] = [];
-
-const firstNumber = getFirstElement(numbers);
-const firstString = getFirstElement(strings);
-const firstEmpty = getFirstElement(emptyArray);
-
-interface Product extends HasId {
+type User = {
+  id: number;
   name: string;
-  price: number;
-}
+  surname: string;
+  age: number;
+  city: string;
+};
 
-const products: Product[] = [
-  { id: 1, name: "Тушь", price: 1000 },
-  { id: 2, name: "Карандаш для глаз", price: 100 },
-  { id: 3, name: "Помада", price: 300 },
+const users: User[] = [
+  { id: 1, name: "John", surname: "Doe", age: 34, city: "NY" },
+  { id: 2, name: "John", surname: "Doe", age: 33, city: "NY" },
+  { id: 3, name: "John", surname: "Doe", age: 35, city: "LA" },
+  { id: 4, name: "Mike", surname: "Doe", age: 35, city: "LA" },
 ];
 
-const foundProduct = findById(products, 2);
-const notFoundProduct = findById(products, 99);
+const userWhere = where<User>();
+const userSort = sort<User>();
+const userGroupBy = groupBy<User>();
+const userHaving = having<User>();
 
-console.log("Пример использования функций\n");
-
-const user1 = createUser(1, "Екатерина", "ecaterina@example.com");
-const user2 = createUser(2, "Поликарп", undefined, false);
-console.log("Пользователи:", user1, user2);
-
-console.log("\nКниги:", bookWithYear, bookWithoutYear);
-
-const circleArea = calculateArea("circle", 5);
-const squareArea = calculateArea("square", 4);
-console.log("\nПлощадь круга (радиус 5):", circleArea);
-console.log("Площадь квадрата (сторона 4):", squareArea);
-
-console.log("\nЦвета статусов:");
-console.log("active:", getStatusColor("active"));
-console.log("inactive:", getStatusColor("inactive"));
-console.log("new:", getStatusColor("new"));
-
-console.log("\nФорматирование строк:");
-console.log(
-  'capitalizeFirstLetter("hello"):',
-  capitalizeFirstLetter("hello")
-);
-console.log(
-  'capitalizeFirstLetter("hello", true):',
-  capitalizeFirstLetter("hello", true)
-);
-console.log('trimAndFormat("  hello world  "):', trimAndFormat("  hello world  "));
-console.log(
-  'trimAndFormat("  hello world  ", true):',
-  trimAndFormat("  hello world  ", true)
+const search = query(
+  userWhere("name", "John"),
+  userWhere("surname", "Doe"),
+  userSort("age")
 );
 
-console.log("\nПервые элементы массивов:");
-console.log("numbers:", firstNumber);
-console.log("strings:", firstString);
-console.log("emptyArray:", firstEmpty);
+const groupAndFilter = query<User, "city">(
+  userGroupBy("city"),
+  userHaving((group) => group.items.length > 1)
+);
 
-console.log("\nПоиск товаров:");
-console.log("Товар с ID 2:", foundProduct);
-console.log("Товар с ID 99:", notFoundProduct);
+const pipeline = query<User, "city">(
+  userWhere("surname", "Doe"),
+  userGroupBy("city"),
+  userHaving((group) => group.items.some((user) => user.age > 34))
+);
+
+const filteredUsers = search(users);
+const groupedUsers = groupAndFilter(users);
+const groupedByAdults = pipeline(users);
+
+const printGroups = (title: string, groups: Group<User, "city">[]) => {
+  console.log(`\n${title}:`);
+  console.log(JSON.stringify(groups, null, 2));
+};
+
+console.log("Пример конвейера преобразований");
+console.log("\nОтфильтрованные и отсортированные пользователи:");
+console.log(JSON.stringify(filteredUsers, null, 2));
+
+printGroups("Группировка по городу с фильтрацией групп", groupedUsers);
+printGroups("Комбинированный конвейер", groupedByAdults);
