@@ -26,6 +26,7 @@ const userWhere = where<User>();
 const userSort = sort<User>();
 const userGroupBy = groupBy<User>();
 const userHaving = having<User>();
+const groupSort = sort<Group<User, "city">>();
 
 const search = query(
   userWhere("name", "John"),
@@ -33,15 +34,16 @@ const search = query(
   userSort("age")
 );
 
-const groupAndFilter = query<User, "city">(
+const groupAndFilter = query(
   userGroupBy("city"),
-  userHaving((group) => group.items.length > 1)
+  userHaving<"city">((group) => group.items.length > 1)
 );
 
-const pipeline = query<User, "city">(
+const pipeline = query(
   userWhere("surname", "Doe"),
   userGroupBy("city"),
-  userHaving((group) => group.items.some((user) => user.age > 34))
+  userHaving<"city">((group) => group.items.some((user) => user.age > 34)),
+  groupSort("key")
 );
 
 const filteredUsers = search(users);

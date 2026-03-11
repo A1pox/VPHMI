@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, expectTypeOf, it } from "vitest";
 import {
   groupBy,
   having,
@@ -6,7 +6,11 @@ import {
   sort,
   where,
   type Group,
+  type GroupByStep,
+  type HavingStep,
+  type SortStep,
   type Transform,
+  type WhereStep,
 } from "./query";
 
 type User = {
@@ -29,6 +33,7 @@ describe("query pipeline", () => {
   const userSort = sort<User>();
   const userGroupBy = groupBy<User>();
   const userHaving = having<User>();
+  const groupSort = sort<Group<User, "city">>();
 
   it("filters objects by a typed key and value", () => {
     const byCity = userWhere("city", "NY");
@@ -84,19 +89,20 @@ describe("query pipeline", () => {
   });
 
   it("filters groups with having", () => {
-    const grouped = query<User, "city">(
+    const grouped = query(
       userGroupBy("city"),
-      userHaving((group) => group.items.length > 1)
+      userHaving<"city">((group) => group.items.length > 1)
     );
 
     expect(grouped(users)).toHaveLength(2);
   });
 
   it("supports a mixed pipeline with object and group steps", () => {
-    const pipeline = query<User, "city">(
+    const pipeline = query(
       userWhere("surname", "Doe"),
       userGroupBy("city"),
-      userHaving((group) => group.items.some((user) => user.age > 34))
+      userHaving<"city">((group) => group.items.some((user) => user.age > 34)),
+      groupSort("key")
     );
 
     expect(pipeline(users)).toEqual([
@@ -118,14 +124,46 @@ describe("query pipeline", () => {
 
   it("preserves TypeScript inference for flat and grouped pipelines", () => {
     const search = query(userWhere("name", "John"), userSort("age"));
-    const grouped = query<User, "city">(
+    const grouped = query(
       userGroupBy("city"),
-      userHaving((group) => group.items.length > 1)
+      userHaving<"city">((group) => group.items.length > 1),
+      groupSort("key")
     );
     const typedSearch: Transform<User> = search;
     const typedGrouped: Group<User, "city">[] = grouped(users);
 
+    expectTypeOf(userWhere("name", "John")).toEqualTypeOf<WhereStep<User>>();
+    expectTypeOf(userSort("age")).toEqualTypeOf<SortStep<User>>();
+    expectTypeOf(userGroupBy("city")).toEqualTypeOf<GroupByStep<User, "city">>();
+    expectTypeOf(userHaving<"city">((group) => group.items.length > 1)).toMatchTypeOf<
+      HavingStep<User, "city">
+    >();
     expect(typedSearch(users)).toHaveLength(3);
     expect(typedGrouped).toHaveLength(2);
+  });
+
+  it("accepts only where then optional groupBy then having then sort", () => {
+    const validFlat = query(userWhere("surname", "Doe"), userSort("age"));
+    const validGrouped = query(
+      userWhere("surname", "Doe"),
+      userGroupBy("city"),
+      userHaving<"city">((group) => group.items.length > 1),
+      groupSort("key")
+    );
+
+    // @ts-expect-error sort cannot go before where
+    query(userSort("age"), userWhere("surname", "Doe"));
+
+    // @ts-expect-error having requires a preceding groupBy
+    query(userHaving<"city">((group) => group.items.length > 1));
+
+    // @ts-expect-error where cannot appear after groupBy
+    query(userGroupBy("city"), userWhere("surname", "Doe"));
+
+    // @ts-expect-error sort on original objects cannot appear after groupBy
+    query(userGroupBy("city"), userHaving<"city">((group) => group.items.length > 1), userSort("age"));
+
+    expect(validFlat(users)).toHaveLength(4);
+    expect(validGrouped(users)).toHaveLength(2);
   });
 });
