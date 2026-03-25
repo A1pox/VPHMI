@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { BookCard } from "./book-card";
 import "./app.css";
+import { mockBooks } from "./mock-books";
 
 type ApiBook = {
   id: number;
@@ -14,19 +15,23 @@ type BookWithCover = ApiBook & {
   coverBlob: Blob | null;
 };
 
-const BOOKS_API_URL = "https://fakeapi.extendsclass.com/books";
-const GOOGLE_BOOKS_API_URL = "https://www.googleapis.com/books/v1/volumes";
+const BOOKS_API_URL = "/api/books";
+const GOOGLE_BOOKS_API_URL = "/api/google-books";
 const MAX_BOOKS = 18;
 
 async function fetchBooks(): Promise<ApiBook[]> {
-  const response = await fetch(BOOKS_API_URL);
+  try {
+    const response = await fetch(BOOKS_API_URL);
 
-  if (!response.ok) {
-    throw new Error(`Не удалось получить список книг: ${response.status}`);
+    if (!response.ok) {
+      throw new Error(`Не удалось получить список книг: ${response.status}`);
+    }
+
+    const books = (await response.json()) as ApiBook[];
+    return books.slice(0, MAX_BOOKS);
+  } catch {
+    return mockBooks;
   }
-
-  const books = (await response.json()) as ApiBook[];
-  return books.slice(0, MAX_BOOKS);
 }
 
 async function fetchCoverBlob(isbn: string): Promise<Blob | null> {
@@ -59,7 +64,9 @@ async function fetchCoverBlob(isbn: string): Promise<Blob | null> {
     return null;
   }
 
-  const imageResponse = await fetch(thumbnail.replace("http://", "https://"));
+  const imageUrl = new URL(thumbnail.replace("http://", "https://"));
+  const proxiedImageUrl = `/api/book-covers${imageUrl.pathname}${imageUrl.search}`;
+  const imageResponse = await fetch(proxiedImageUrl);
 
   if (!imageResponse.ok) {
     return null;
@@ -115,12 +122,8 @@ export default function App() {
   return (
     <main className="page-shell">
       <section className="hero">
-        <p className="hero__eyebrow">Домашнее задание 7</p>
-        <h1 className="hero__title">Каталог книг с обложками из Google Books</h1>
-        <p className="hero__subtitle">
-          Данные о книгах загружаются из `fakeapi.extendsclass.com`, а изображения приходят в
-          карточки как `Blob`.
-        </p>
+        <p className="hero__eyebrow">Lab7</p>
+        <h1 className="hero__title">Каталог книг</h1>
       </section>
 
       {loading ? <p className="status-card">Загрузка книг...</p> : null}
