@@ -4,13 +4,18 @@ import {
   capitalizeFirstLetter,
   createBook,
   createUser,
+  type DeepReadonly,
+  type EventHandlers,
   findById,
   getFirstElement,
   getStatusColor,
+  type PickedByType,
   trimAndFormat,
   type Book,
   type HasId,
 } from "./tasks";
+
+const expectType = <T>(_value: T) => undefined;
 
 describe("createUser", () => {
   it("creates user with default isActive=true", () => {
@@ -122,5 +127,82 @@ describe("findById", () => {
 
   it("returns undefined when id is not found", () => {
     expect(findById(products, 999)).toBeUndefined();
+  });
+});
+
+describe("utility types", () => {
+  it("DeepReadonly makes nested fields readonly recursively", () => {
+    type Settings = {
+      title: string;
+      meta: {
+        enabled: boolean;
+        tags: string[];
+      };
+      steps: [{ done: boolean }, { done: boolean }];
+      callback: (value: number) => string;
+    };
+
+    type ReadonlySettings = DeepReadonly<Settings>;
+
+    expectType<{
+      readonly title: string;
+      readonly meta: {
+        readonly enabled: boolean;
+        readonly tags: readonly string[];
+      };
+      readonly steps: readonly [{ readonly done: boolean }, { readonly done: boolean }];
+      readonly callback: (value: number) => string;
+    }>({} as ReadonlySettings);
+
+    expectType<ReadonlySettings>({} as {
+      readonly title: string;
+      readonly meta: {
+        readonly enabled: boolean;
+        readonly tags: readonly string[];
+      };
+      readonly steps: readonly [{ readonly done: boolean }, { readonly done: boolean }];
+      readonly callback: (value: number) => string;
+    });
+  });
+
+  it("PickedByType keeps only properties assignable to target type", () => {
+    type Source = {
+      id: number;
+      name: string;
+      isActive: boolean;
+      age?: number;
+      description?: string;
+    };
+
+    type StringsOnly = PickedByType<Source, string>;
+    type NumbersOnly = PickedByType<Source, number | undefined>;
+
+    expectType<{ name: string }>({} as StringsOnly);
+    expectType<StringsOnly>({} as { name: string });
+
+    expectType<{ id: number; age?: number }>({} as NumbersOnly);
+    expectType<NumbersOnly>({} as { id: number; age?: number });
+  });
+
+  it("EventHandlers creates onEventName handlers from event map", () => {
+    type AppEvents = {
+      click: { x: number; y: number };
+      submit: { formId: string };
+      ready: undefined;
+    };
+
+    type Handlers = EventHandlers<AppEvents>;
+
+    expectType<{
+      onClick: (event: { x: number; y: number }) => void;
+      onSubmit: (event: { formId: string }) => void;
+      onReady: (event: undefined) => void;
+    }>({} as Handlers);
+
+    expectType<Handlers>({} as {
+      onClick: (event: { x: number; y: number }) => void;
+      onSubmit: (event: { formId: string }) => void;
+      onReady: (event: undefined) => void;
+    });
   });
 });
