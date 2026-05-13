@@ -1,0 +1,611 @@
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  font-size: 14px;
+  color: #111;
+  background: #fff;
+}
+
+h1,
+h2 {
+  margin: 0 0 12px;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+h2 {
+  margin-top: 24px;
+  font-size: 16px;
+}
+
+button,
+input,
+select {
+  font: inherit;
+}
+
+/* Auth */
+.form-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.form-box {
+  width: 340px;
+  border: 1px solid #111;
+  padding: 16px;
+  background: #fff;
+}
+
+.form-box label,
+.plain-form label,
+.modal label {
+  display: block;
+  margin: 8px 0 4px;
+  font-weight: 700;
+}
+
+.form-box input,
+.plain-form input,
+.modal input,
+.inline-input,
+.title-input,
+.formula-input {
+  width: 100%;
+  border: 1px solid #111;
+  padding: 4px 6px;
+  background: #fff;
+  color: #111;
+}
+
+.form-box button[type='submit'] {
+  width: 100%;
+  margin-top: 12px;
+}
+
+.center-text {
+  text-align: center;
+}
+
+.center-text p {
+  margin: 0 0 12px;
+}
+
+/* Layout */
+.app-layout {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  height: 100vh;
+}
+
+.app-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+  border-bottom: 1px solid #111;
+  padding: 6px 10px;
+  background: #eee;
+}
+
+.app-header-title {
+  flex: 1;
+  font-weight: 700;
+}
+
+.app-header-nav,
+.row-actions,
+.editor-actions,
+.page-actions,
+.modal-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.app-body {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+}
+
+.app-sidebar {
+  width: 170px;
+  flex-shrink: 0;
+  border-right: 1px solid #111;
+  padding: 10px;
+  background: #f6f6f6;
+}
+
+.sidebar-section-title {
+  margin-bottom: 8px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.nav-link,
+.sidebar-link,
+.breadcrumb-link,
+.text-button {
+  color: #0645ad;
+  text-decoration: underline;
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+}
+
+.nav-link,
+.sidebar-link {
+  display: block;
+  margin-bottom: 8px;
+}
+
+.nav-link.active,
+.sidebar-link.active {
+  font-weight: 700;
+}
+
+.app-header-logout {
+  border: 1px solid #111;
+  background: #fff;
+  padding: 4px 8px;
+  cursor: pointer;
+}
+
+.app-main {
+  flex: 1;
+  min-width: 0;
+  overflow: auto;
+  padding: 14px;
+}
+
+.app-main-editor {
+  padding: 0;
+  overflow: hidden;
+}
+
+/* Common */
+.btn {
+  border: 1px solid #111;
+  background: #fff;
+  color: #111;
+  padding: 4px 8px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.btn:hover,
+.fmt-btn:hover,
+.app-header-logout:hover {
+  background: #e6e6e6;
+}
+
+.btn:disabled {
+  color: #777;
+  cursor: not-allowed;
+}
+
+.btn-primary {
+  font-weight: 700;
+}
+
+.btn-danger {
+  color: #900;
+}
+
+.file-btn {
+  display: inline-flex;
+  align-items: center;
+}
+
+.plain-msg,
+.error-msg,
+.notification {
+  margin: 8px 0;
+}
+
+.error-msg,
+.notification-error {
+  color: #900;
+}
+
+.notification-success {
+  color: #060;
+}
+
+.notification-info {
+  color: #111;
+}
+
+.notification {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.notification-close {
+  border: 0;
+  background: none;
+  color: inherit;
+  cursor: pointer;
+  padding: 0;
+  text-decoration: underline;
+}
+
+/* Documents */
+.page-actions {
+  margin-bottom: 12px;
+}
+
+.documents-table,
+.profile-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+}
+
+.documents-table th,
+.documents-table td,
+.profile-table th,
+.profile-table td {
+  border: 1px solid #111;
+  padding: 6px;
+  text-align: left;
+  vertical-align: top;
+}
+
+.documents-table th,
+.profile-table th {
+  background: #eee;
+}
+
+.documents-table th:last-child,
+.documents-table td:last-child {
+  width: 1%;
+  white-space: nowrap;
+}
+
+.doc-preview-table {
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+.doc-preview-table td {
+  min-width: 42px;
+  max-width: 70px;
+  height: 18px;
+  border: 1px solid #aaa;
+  padding: 1px 3px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 12px;
+}
+
+/* Modal */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.75);
+  z-index: 100;
+}
+
+.modal {
+  width: 320px;
+  border: 1px solid #111;
+  padding: 16px;
+  background: #fff;
+}
+
+.modal-actions {
+  justify-content: flex-end;
+  margin-top: 12px;
+}
+
+/* Editor */
+.editor-page {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  background: #fff;
+}
+
+.editor-header,
+.format-toolbar,
+.formula-bar {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  gap: 6px;
+  border-bottom: 1px solid #111;
+  padding: 4px 8px;
+  background: #eee;
+}
+
+.editor-header {
+  flex-wrap: wrap;
+}
+
+.breadcrumbs {
+  min-width: 210px;
+}
+
+.breadcrumb-current {
+  font-weight: 700;
+}
+
+.breadcrumb-sep {
+  color: #555;
+}
+
+.title-input {
+  flex: 1;
+  min-width: 160px;
+}
+
+.save-status {
+  min-width: 120px;
+  font-weight: 700;
+}
+
+.save-status-error {
+  color: #900;
+}
+
+.save-status-unsaved {
+  color: #850;
+}
+
+.save-status-saved {
+  color: #060;
+}
+
+.format-toolbar {
+  flex-wrap: wrap;
+}
+
+.fmt-btn,
+.fmt-color-label,
+.fmt-select {
+  min-width: 26px;
+  height: 24px;
+  border: 1px solid #111;
+  background: #fff;
+  color: #111;
+  padding: 2px 6px;
+  cursor: pointer;
+}
+
+.fmt-btn.active {
+  background: #ddd;
+  font-weight: 700;
+}
+
+.fmt-separator {
+  width: 1px;
+  height: 18px;
+  background: #111;
+  margin: 0 2px;
+}
+
+.fmt-color-label {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.fmt-color-input {
+  position: absolute;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+}
+
+.fmt-bg-swatch {
+  display: inline-block;
+  min-width: 14px;
+  text-align: center;
+}
+
+.formula-bar {
+  background: #f6f6f6;
+}
+
+.cell-ref {
+  width: 54px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.formula-input {
+  flex: 1;
+}
+
+/* Spreadsheet */
+.grid-wrapper {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  outline: none;
+}
+
+.spreadsheet {
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+.corner-header,
+.col-header,
+.row-header,
+.cell {
+  border: 1px solid #bbb;
+}
+
+.corner-header {
+  position: sticky;
+  top: 0;
+  left: 0;
+  z-index: 4;
+  background: #ddd;
+}
+
+.col-header {
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  height: 22px;
+  background: #ddd;
+  text-align: center;
+  font-size: 12px;
+  user-select: none;
+  white-space: nowrap;
+}
+
+.row-header {
+  position: sticky;
+  left: 0;
+  z-index: 2;
+  height: 22px;
+  background: #ddd;
+  text-align: center;
+  font-size: 12px;
+  user-select: none;
+}
+
+.selected-header {
+  background: #ccc;
+}
+
+.col-resize-handle,
+.row-resize-handle {
+  position: absolute;
+  z-index: 5;
+}
+
+.col-resize-handle {
+  top: 0;
+  right: 0;
+  width: 5px;
+  height: 100%;
+  cursor: col-resize;
+}
+
+.row-resize-handle {
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 5px;
+  cursor: row-resize;
+}
+
+.col-resize-handle:hover,
+.row-resize-handle:hover {
+  background: #111;
+}
+
+.cell {
+  height: 22px;
+  padding: 0;
+  overflow: hidden;
+  background: #fff;
+  cursor: cell;
+  font-size: 13px;
+}
+
+.cell-selected {
+  outline: 2px solid #111;
+  outline-offset: -2px;
+  background: #eee !important;
+  position: relative;
+  z-index: 1;
+}
+
+.cell-in-range {
+  background: #f0f0f0;
+}
+
+.cell span {
+  display: block;
+  height: 100%;
+  padding: 2px 4px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.cell-input {
+  width: 100%;
+  height: 100%;
+  border: 0;
+  outline: 1px solid #111;
+  padding: 2px 4px;
+  background: #fff;
+  font: inherit;
+}
+
+/* Context menu */
+.context-menu {
+  min-width: 190px;
+  border: 1px solid #111;
+  background: #fff;
+  z-index: 1000;
+}
+
+.context-menu-item {
+  display: block;
+  width: 100%;
+  border: 0;
+  background: #fff;
+  padding: 5px 8px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.context-menu-item:hover {
+  background: #eee;
+}
+
+.context-menu-item.danger {
+  color: #900;
+}
+
+.context-menu-sep {
+  height: 1px;
+  background: #111;
+}
+
+/* Profile */
+.profile-table {
+  max-width: 520px;
+  margin-bottom: 16px;
+}
+
+.plain-form {
+  max-width: 420px;
+  margin-bottom: 16px;
+}
+
+.plain-form .btn {
+  margin-top: 10px;
+}
